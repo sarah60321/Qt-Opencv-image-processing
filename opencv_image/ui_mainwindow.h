@@ -44,6 +44,7 @@ public:
     QPushButton *pushButton_Blur;
     QPushButton *pushButton_Save;
     QPushButton *pushButton_Invert;
+    QLabel *label_information;
     QMenuBar *menuBar;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
@@ -80,7 +81,7 @@ public:
         pushButton_Binary->setCheckable(false);
         horizontalSlider = new QSlider(centralWidget);
         horizontalSlider->setObjectName(QStringLiteral("horizontalSlider"));
-        horizontalSlider->setGeometry(QRect(570, 30, 311, 22));
+        horizontalSlider->setGeometry(QRect(570, 30, 281, 22));
         horizontalSlider->setMaximum(255);
         horizontalSlider->setOrientation(Qt::Horizontal);
         label_slider = new QLabel(centralWidget);
@@ -109,6 +110,9 @@ public:
         pushButton_Invert = new QPushButton(centralWidget);
         pushButton_Invert->setObjectName(QStringLiteral("pushButton_Invert"));
         pushButton_Invert->setGeometry(QRect(280, 10, 75, 23));
+        label_information = new QLabel(centralWidget);
+        label_information->setObjectName(QStringLiteral("label_information"));
+        label_information->setGeometry(QRect(430, 70, 421, 16));
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
@@ -143,6 +147,7 @@ public:
         pushButton_Blur->setText(QApplication::translate("MainWindow", "Blur", Q_NULLPTR));
         pushButton_Save->setText(QApplication::translate("MainWindow", "Save Image", Q_NULLPTR));
         pushButton_Invert->setText(QApplication::translate("MainWindow", "Invert", Q_NULLPTR));
+        label_information->setText(QApplication::translate("MainWindow", "Information: ", Q_NULLPTR));
     } // retranslateUi
 
 };

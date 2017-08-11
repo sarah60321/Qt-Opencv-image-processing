@@ -39,8 +39,6 @@ private slots:
 
     void on_pushButton_Invert_clicked();
 
-    void reset_flag(int flag);
-
     void on_pushButton_Blur_clicked();
 
     void on_pushButton_Brightness_clicked();
@@ -49,6 +47,8 @@ private slots:
 
     void on_pushButton_Save_clicked();
 
+    void cal_percentage();
+
 private:
     Ui::MainWindow *ui;
     cv::Mat Ori;
@@ -56,8 +56,8 @@ private:
     cv::Mat Gray;
     cv::Mat Final_img;
     bool GrayYet;
-    bool button_check[6];
     int color;
+    int status;
 };
 
 #endif // MAINWINDOW_H

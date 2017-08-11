@@ -7,16 +7,16 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     this->setWindowTitle("Image Processing using opencv and Qt");
-    for(int i=0; i<6; i++){
-        button_check[i]=false;
-    }
     color=0;
+    status=0;
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+//-----------------basic settings---------------------
 
 void MainWindow::on_pushButton_open_clicked()
 {
@@ -36,6 +36,7 @@ void MainWindow::on_pushButton_open_clicked()
         showImage(mat_original);
         GrayYet = false;
     }
+    ui->label_img_processed->clear();
 }
 
 QImage MainWindow::Mat2QImage(const cv::Mat mat_original)
@@ -90,8 +91,18 @@ void MainWindow::on_pushButton_Save_clicked()
 {
     //Save processed image
     cv::Mat mat_final = this->Final_img;
-    cv::imshow("", mat_final);
-    cv::imwrite("processed.bmp", mat_final);
+//    cv::imshow("", mat_final);
+//    cv::imwrite("processed.bmp", mat_final);
+
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Image"), "/", tr("image (*.bmp)"));
+    if(fileName==NULL){
+        QMessageBox::information(0,"Error!","Need image name!");
+        return;
+    }
+    else{
+        cv::imwrite(fileName.toStdString(),mat_final);
+    }
+
 }
 
 void MainWindow::on_pushButton_Clear_clicked()
@@ -99,12 +110,9 @@ void MainWindow::on_pushButton_Clear_clicked()
     //Clear all image
     ui->label_img_original->clear();
     ui->label_img_processed->clear();
-    for(int i=0; i<6; i++){
-        button_check[i]=false;
-    }
 }
 
-
+//--------------image processing-----------------
 
 void MainWindow::on_pushButton_gray_clicked()
 {
@@ -127,8 +135,8 @@ void MainWindow::on_pushButton_gray_clicked()
     this->Final_img = mat_gray.clone();
     GrayYet = true;
     ui->label_img_processed->setPixmap(QPixmap::fromImage(this->Mat2QImage(mat_gray)));
-    //change flag
-//    reset_flag(0);
+    //change status
+    status = 1;
 }
 
 void MainWindow::on_pushButton_Binary_clicked()
@@ -148,9 +156,12 @@ void MainWindow::on_pushButton_Binary_clicked()
     //easy way
     threshold(mat_gray, mat_cut, 125, 255, cv::THRESH_BINARY);
     ui->label_img_processed->setPixmap(QPixmap::fromImage(this->Mat2QImage(mat_cut)));
+    ui->horizontalSlider->setSliderPosition(125);
     this->Final_img = mat_cut.clone();
-    //change flag
-//    reset_flag(1);
+    //calculate black percentage
+    cal_percentage();
+    //change status
+    status = 2;
 }
 
 void MainWindow::on_pushButton_Invert_clicked()
@@ -174,8 +185,8 @@ void MainWindow::on_pushButton_Invert_clicked()
     }
     ui->label_img_processed->setPixmap(QPixmap::fromImage(this->Mat2QImage(mat_invert)));
     this->Final_img = mat_invert.clone();
-    //change flag
-//    reset_flag(2);
+    //change status
+    status = 3;
 }
 
 void MainWindow::on_pushButton_Brightness_clicked()
@@ -195,16 +206,16 @@ void MainWindow::on_pushButton_Brightness_clicked()
                     mat_bright.at<cv::Vec3b>(r,c)[k]=0;
                 }
                 else{
-                    mat_bright.at<cv::Vec3b>(r,c)[k] =
-                            mat_bright.at<cv::Vec3b>(r,c)[k]+50;
+                    mat_bright.at<cv::Vec3b>(r,c)[k] = mat_bright.at<cv::Vec3b>(r,c)[k]+50;
                 }
             }
         }
     }
     ui->label_img_processed->setPixmap(QPixmap::fromImage(this->Mat2QImage(mat_bright)));
+    ui->horizontalSlider->setSliderPosition(50);
     this->Final_img = mat_bright.clone();
-    //change flag
-//    reset_flag(3);
+    //change status
+    status = 4;
 
 }
 
@@ -217,9 +228,7 @@ void MainWindow::on_pushButton_Color_clicked()
 //    mat_bright.create(cv::Size(mat_processed.cols,mat_processed.rows),CV_8UC1);
     QVector<int> value(3);
     if(color==0){
-        value[0] = 50;
-        value[1] = 0;
-        value[2] = 0;
+        value[0] = 50; value[1] = 0; value[2] = 0;
     }
     else if(color==1){
         value[0] = 0;
@@ -251,9 +260,8 @@ void MainWindow::on_pushButton_Color_clicked()
     if(color==3) color=0;
     ui->label_img_processed->setPixmap(QPixmap::fromImage(this->Mat2QImage(mat_color)));
     this->Final_img = mat_color.clone();
-    //change flag
-//    reset_flag(4);
-
+    //change status
+    status = 5;
 }
 
 
@@ -282,77 +290,81 @@ void MainWindow::on_pushButton_Blur_clicked()
     }
     ui->label_img_processed->setPixmap(QPixmap::fromImage(this->Mat2QImage(mat_blur)));
     this->Final_img = mat_blur.clone();
-    //change flag
-//    reset_flag(5);
+    //change status
+    status = 6;
 
 }
+
+//------------------slider------------------
 
 void MainWindow::on_horizontalSlider_valueChanged(int value)
 {
     //action depends on status
-    for(int i=0; i<6; i++){
-        if(button_check[i]=true){
-
-            //only works when Binary #2 / Brightness #4 / Color #5 / Blur #6 checked
-            if(i+1 == 2) {  //binary
-                if(!GrayYet){
-                    cv::Mat mat_processed = this->Processed;
-                    cv::Mat mat_gray;
-                    mat_gray.create(cv::Size(mat_processed.cols,mat_processed.rows),CV_8UC1);
-                    cv::cvtColor(mat_processed, mat_gray, CV_BGR2GRAY);
-                    this->Gray = mat_gray.clone();
-                    GrayYet = true;
-                }
-                cv::Mat mat_gray = this->Gray;
-                cv::Mat mat_cut;
-                mat_cut.create(cv::Size(mat_gray.cols,mat_gray.rows),CV_8UC1);
-                threshold(mat_gray, mat_cut, value, 255, cv::THRESH_BINARY);
-                ui->label_img_processed->setPixmap(QPixmap::fromImage(this->Mat2QImage(mat_cut)));
-                this->Final_img = mat_cut.clone();
+        //only works when Binary #2 / Brightness #4 / Color #5 / Blur #6 checked
+    if(status == 2) {  //binary
+        if(!GrayYet){
+            cv::Mat mat_processed = this->Processed;
+            cv::Mat mat_gray;
+                mat_gray.create(cv::Size(mat_processed.cols,mat_processed.rows),CV_8UC1);
+                cv::cvtColor(mat_processed, mat_gray, CV_BGR2GRAY);
+                this->Gray = mat_gray.clone();
+                GrayYet = true;
             }
-
-            else if(i+1 == 4) {  //Brightness
-                cv::Mat mat_processed = this->Processed;
-                cv::Mat mat_bright;
-                mat_bright.create(cv::Size(mat_processed.cols,mat_processed.rows),CV_8UC1);
-                for(int r=0; r<mat_processed.rows; r++){
-                    for(int c=0; c<mat_processed.cols; c++){
-                        for(int k=0; k<mat_processed.channels(); k++){
-                            if(mat_bright.at<cv::Vec3b>(r,c)[k]+value >255){
-                                mat_bright.at<cv::Vec3b>(r,c)[k]=255;
-                            }
-                            else if(mat_bright.at<cv::Vec3b>(r,c)[k]+value <0){
-                                mat_bright.at<cv::Vec3b>(r,c)[k]=0;
-                            }
-                            else{
-                                mat_bright.at<cv::Vec3b>(r,c)[k] =
-                                        mat_bright.at<cv::Vec3b>(r,c)[k]+value;
-                            }
+            cv::Mat mat_gray = this->Gray;
+            cv::Mat mat_cut;
+            mat_cut.create(cv::Size(mat_gray.cols,mat_gray.rows),CV_8UC1);
+            threshold(mat_gray, mat_cut, value, 255, cv::THRESH_BINARY);
+            ui->label_img_processed->setPixmap(QPixmap::fromImage(this->Mat2QImage(mat_cut)));
+            this->Final_img = mat_cut.clone();
+            //calculate black percentage
+            cal_percentage();
+        }
+        else if(status == 4) {  //Brightness
+            cv::Mat mat_processed = this->Processed;
+            cv::Mat mat_bright;
+            mat_bright = mat_processed.clone();
+//            mat_bright.create(cv::Size(mat_processed.cols,mat_processed.rows),CV_8UC1);
+            for(int r=0; r<mat_bright.rows; r++){
+                for(int c=0; c<mat_bright.cols; c++){
+                    for(int k=0; k<mat_bright.channels(); k++){
+                        if(mat_bright.at<cv::Vec3b>(r,c)[k]+(value-125)*2 >255){
+                            mat_bright.at<cv::Vec3b>(r,c)[k]=255;
+                        }
+                        else if(mat_bright.at<cv::Vec3b>(r,c)[k]+(value-125)*2 <0){
+                            mat_bright.at<cv::Vec3b>(r,c)[k]=0;
+                        }
+                        else{
+                            mat_bright.at<cv::Vec3b>(r,c)[k] =
+                                    mat_bright.at<cv::Vec3b>(r,c)[k]+(value-125)*2;
                         }
                     }
                 }
             }
-            else if(i+1 == 5) {  //Color
+            ui->label_img_processed->setPixmap(QPixmap::fromImage(this->Mat2QImage(mat_bright)));
+            this->Final_img = mat_bright.clone();
+        }
+        else if(status == 5) {  //Color
 
-            }
-            else if(i+1 == 6) {  //Blur
-
-            }
 
         }
-    }
+        else if(status == 6) {  //Blur
+        }
 }
 
-void MainWindow::reset_flag(int flag)
+//-------------------other functions----------------------
+
+void MainWindow::cal_percentage()
 {
-    //reset flag
-    qDebug() << "here";
-    for(int i=0; i<6; i++){
-        if(i=flag){
-            button_check[i]=true;
-        }
-        else{
-            button_check[i]=false;
+    //calculate percentage of black pixel
+    cv::Mat mat_cut = this->Final_img;
+    double count = 0 ;
+    for(int r=0; r<mat_cut.rows; r++){
+        for(int c=0; c<mat_cut.cols; c++){
+            if(mat_cut.at<uchar>(r,c) == 0)
+                count ++;
         }
     }
+    double total = mat_cut.rows * mat_cut.cols;
+    double ratio = count * 100 /total;
+    ui->label_information->setText("Information: black percentage " + QString::number(ratio) + " %");
 }

@@ -21,8 +21,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_MainWindow_t {
-    QByteArrayData data[19];
-    char stringdata0[364];
+    QByteArrayData data[18];
+    char stringdata0[363];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -44,12 +44,11 @@ QT_MOC_LITERAL(9, 141, 5), // "value"
 QT_MOC_LITERAL(10, 147, 28), // "on_pushButton_Binary_clicked"
 QT_MOC_LITERAL(11, 176, 27), // "on_pushButton_Clear_clicked"
 QT_MOC_LITERAL(12, 204, 28), // "on_pushButton_Invert_clicked"
-QT_MOC_LITERAL(13, 233, 10), // "reset_flag"
-QT_MOC_LITERAL(14, 244, 4), // "flag"
-QT_MOC_LITERAL(15, 249, 26), // "on_pushButton_Blur_clicked"
-QT_MOC_LITERAL(16, 276, 32), // "on_pushButton_Brightness_clicked"
-QT_MOC_LITERAL(17, 309, 27), // "on_pushButton_Color_clicked"
-QT_MOC_LITERAL(18, 337, 26) // "on_pushButton_Save_clicked"
+QT_MOC_LITERAL(13, 233, 26), // "on_pushButton_Blur_clicked"
+QT_MOC_LITERAL(14, 260, 32), // "on_pushButton_Brightness_clicked"
+QT_MOC_LITERAL(15, 293, 27), // "on_pushButton_Color_clicked"
+QT_MOC_LITERAL(16, 321, 26), // "on_pushButton_Save_clicked"
+QT_MOC_LITERAL(17, 348, 14) // "cal_percentage"
 
     },
     "MainWindow\0on_pushButton_open_clicked\0"
@@ -58,11 +57,11 @@ QT_MOC_LITERAL(18, 337, 26) // "on_pushButton_Save_clicked"
     "on_horizontalSlider_valueChanged\0value\0"
     "on_pushButton_Binary_clicked\0"
     "on_pushButton_Clear_clicked\0"
-    "on_pushButton_Invert_clicked\0reset_flag\0"
-    "flag\0on_pushButton_Blur_clicked\0"
+    "on_pushButton_Invert_clicked\0"
+    "on_pushButton_Blur_clicked\0"
     "on_pushButton_Brightness_clicked\0"
     "on_pushButton_Color_clicked\0"
-    "on_pushButton_Save_clicked"
+    "on_pushButton_Save_clicked\0cal_percentage"
 };
 #undef QT_MOC_LITERAL
 
@@ -88,11 +87,11 @@ static const uint qt_meta_data_MainWindow[] = {
       10,    0,   90,    2, 0x08 /* Private */,
       11,    0,   91,    2, 0x08 /* Private */,
       12,    0,   92,    2, 0x08 /* Private */,
-      13,    1,   93,    2, 0x08 /* Private */,
-      15,    0,   96,    2, 0x08 /* Private */,
-      16,    0,   97,    2, 0x08 /* Private */,
-      17,    0,   98,    2, 0x08 /* Private */,
-      18,    0,   99,    2, 0x08 /* Private */,
+      13,    0,   93,    2, 0x08 /* Private */,
+      14,    0,   94,    2, 0x08 /* Private */,
+      15,    0,   95,    2, 0x08 /* Private */,
+      16,    0,   96,    2, 0x08 /* Private */,
+      17,    0,   97,    2, 0x08 /* Private */,
 
  // slots: parameters
     QMetaType::Void,
@@ -103,7 +102,7 @@ static const uint qt_meta_data_MainWindow[] = {
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::Int,   14,
+    QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
@@ -127,11 +126,11 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 5: _t->on_pushButton_Binary_clicked(); break;
         case 6: _t->on_pushButton_Clear_clicked(); break;
         case 7: _t->on_pushButton_Invert_clicked(); break;
-        case 8: _t->reset_flag((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 9: _t->on_pushButton_Blur_clicked(); break;
-        case 10: _t->on_pushButton_Brightness_clicked(); break;
-        case 11: _t->on_pushButton_Color_clicked(); break;
-        case 12: _t->on_pushButton_Save_clicked(); break;
+        case 8: _t->on_pushButton_Blur_clicked(); break;
+        case 9: _t->on_pushButton_Brightness_clicked(); break;
+        case 10: _t->on_pushButton_Color_clicked(); break;
+        case 11: _t->on_pushButton_Save_clicked(); break;
+        case 12: _t->cal_percentage(); break;
         default: ;
         }
     }

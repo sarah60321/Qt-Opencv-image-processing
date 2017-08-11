@@ -135,6 +135,7 @@ void MainWindow::on_pushButton_gray_clicked()
     this->Final_img = mat_gray.clone();
     GrayYet = true;
     ui->label_img_processed->setPixmap(QPixmap::fromImage(this->Mat2QImage(mat_gray)));
+    ui->label_information->setText("Status: Grayscale");
     //change status
     status = 1;
 }
@@ -184,6 +185,7 @@ void MainWindow::on_pushButton_Invert_clicked()
         }
     }
     ui->label_img_processed->setPixmap(QPixmap::fromImage(this->Mat2QImage(mat_invert)));
+    ui->label_information->setText("Status: Invert");
     this->Final_img = mat_invert.clone();
     //change status
     status = 3;
@@ -212,7 +214,8 @@ void MainWindow::on_pushButton_Brightness_clicked()
         }
     }
     ui->label_img_processed->setPixmap(QPixmap::fromImage(this->Mat2QImage(mat_bright)));
-    ui->horizontalSlider->setSliderPosition(50);
+    ui->horizontalSlider->setSliderPosition(150);
+    ui->label_information->setText("Status: Brightness +50");
     this->Final_img = mat_bright.clone();
     //change status
     status = 4;
@@ -259,6 +262,7 @@ void MainWindow::on_pushButton_Color_clicked()
     color+=1;
     if(color==3) color=0;
     ui->label_img_processed->setPixmap(QPixmap::fromImage(this->Mat2QImage(mat_color)));
+    ui->label_information->setText("Status: Color changed");
     this->Final_img = mat_color.clone();
     //change status
     status = 5;
@@ -272,27 +276,25 @@ void MainWindow::on_pushButton_Blur_clicked()
     cv::Mat mat_blur;
     mat_blur = mat_processed.clone();
 //    mat_blur.create(cv::Size(mat_processed.cols,mat_processed.rows),CV_8UC1);
-    for(int r=1; r<mat_processed.rows-1; r++){
-        for(int c=1; c<mat_processed.cols-1; c++){
-            for(int n=0; n<mat_processed.channels(); n++){
-                mat_blur.at<cv::Vec3b>(r,c)[n] =
-                        (mat_processed.at<cv::Vec3b>(r-1,c-1)[n]
-                         +mat_processed.at<cv::Vec3b>(r-1,c)[n]
-                         +mat_processed.at<cv::Vec3b>(r-1,c+1)[n]
-                         +mat_processed.at<cv::Vec3b>(r,c-1)[n]
-                         +mat_processed.at<cv::Vec3b>(r,c)[n]
-                         +mat_processed.at<cv::Vec3b>(r,c+1)[n]
-                         +mat_processed.at<cv::Vec3b>(r+1,c-1)[n]
-                         +mat_processed.at<cv::Vec3b>(r+1,c)[n]
-                         +mat_processed.at<cv::Vec3b>(r+1,c+1)[n])/9;
-            }
-        }
-    }
+    //easy way
+    cv::blur(mat_processed,mat_blur,cv::Size(3,3));
+    //do it by myself
+//    for(int r=1; r<mat_processed.rows-1; r++){
+//        for(int c=1; c<mat_processed.cols-1; c++){
+//            for(int n=0; n<mat_processed.channels(); n++){
+//                mat_blur.at<cv::Vec3b>(r,c)[n] =
+//                        (mat_processed.at<cv::Vec3b>(r-1,c-1)[n] + mat_processed.at<cv::Vec3b>(r-1,c)[n] + mat_processed.at<cv::Vec3b>(r-1,c+1)[n]
+//                         + mat_processed.at<cv::Vec3b>(r,c-1)[n] + mat_processed.at<cv::Vec3b>(r,c)[n] + mat_processed.at<cv::Vec3b>(r,c+1)[n]
+//                         + mat_processed.at<cv::Vec3b>(r+1,c-1)[n] + mat_processed.at<cv::Vec3b>(r+1,c)[n] + mat_processed.at<cv::Vec3b>(r+1,c+1)[n])/9;
+//            }
+//        }
+//    }
     ui->label_img_processed->setPixmap(QPixmap::fromImage(this->Mat2QImage(mat_blur)));
+    ui->label_information->setText("Status: Blur 3");
+    ui->horizontalSlider->setSliderPosition(6);
     this->Final_img = mat_blur.clone();
     //change status
     status = 6;
-
 }
 
 //------------------slider------------------
@@ -341,6 +343,8 @@ void MainWindow::on_horizontalSlider_valueChanged(int value)
                 }
             }
             ui->label_img_processed->setPixmap(QPixmap::fromImage(this->Mat2QImage(mat_bright)));
+            if((value-125)*2 > 0){ui->label_information->setText("Status: Brightness +" + QString::number((value-125)*2));}
+            else{ui->label_information->setText("Status: Brightness " + QString::number((value-125)*2));}
             this->Final_img = mat_bright.clone();
         }
         else if(status == 5) {  //Color
@@ -348,7 +352,16 @@ void MainWindow::on_horizontalSlider_valueChanged(int value)
 
         }
         else if(status == 6) {  //Blur
+        if(value>1){
+            cv::Mat mat_processed = this->Processed;
+            cv::Mat mat_blur;
+            mat_blur = mat_processed.clone();
+            cv::blur(mat_processed,mat_blur,cv::Size(value/2,value/2));
+            ui->label_img_processed->setPixmap(QPixmap::fromImage(this->Mat2QImage(mat_blur)));
+            ui->label_information->setText("Status: Blur " + QString::number(value/2));
+            this->Final_img = mat_blur.clone();
         }
+    }
 }
 
 //-------------------other functions----------------------
@@ -366,5 +379,5 @@ void MainWindow::cal_percentage()
     }
     double total = mat_cut.rows * mat_cut.cols;
     double ratio = count * 100 /total;
-    ui->label_information->setText("Information: black percentage " + QString::number(ratio) + " %");
+    ui->label_information->setText("Status: Binary, black percentage " + QString::number(ratio) + " %");
 }
